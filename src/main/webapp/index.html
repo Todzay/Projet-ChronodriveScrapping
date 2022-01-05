@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Scapping de Chronodrive</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <script type="text/javascript">
+            var webSocket = new WebSocket("ws://localhost:8080/ChronodriveScrapping/ScrappingEndpoint");
+            
+            webSocket.onerror = function(event) {
+                onError(event);
+            };
+            
+            webSocket.onopen = function(event) {
+                onOpen(event);
+            };
+            
+            webSocket.onmessage = function(event) {
+                onMessage(event);
+            };
+            
+            function send() {
+                document.getElementById('Wait').innerHTML = 'Le Scrapping peut prendre quelques secondes, merci de patienter ...';
+                webSocket.send("Scrapper Chronodrive");
+                return false;
+            }
+            
+            function onMessage(event) {
+                var json = JSON.parse(event.data);
+                document.getElementById('Data').innerHTML 
+                        += '<br><strong>Nom Article : </strong>' + json.name
+                        + '<br><strong>Prix Article : </strong>' + json.price
+                        + '<br><strong>Capacité Article : </strong>' + json.capacity
+                        + '<br><strong>Lien Article : </strong><a href="' + json.link + '">' + json.link + '</a>'
+                        + '<br><br><img height="200" src=' +  json.image + '><br><br>';
+            }
+            
+            function onOpen(event) {
+                alert('Connecté');
+            }
+
+            function onError(event) {
+                alert('Erreur');
+            }
+        </script>
+    </head> 
+    <body>
+        <h1>Bienvenue sur notre projet de Web Scrapping</h1>
+        <br><br>
+        <p>Nous scrappons ici 20 articles au hasard de la page des <a href="https://www.chronodrive.com/bio-ecolo/frais-et-surgeles-bio-R13845364">Frais et Surgelés</a> du magasin en ligne de Chronodrive. 
+        <br><br><br>Merci de cliquer ici : <input type="submit" value="Scrapper Chronodrive" onclick="send()" />
+        <br><br>
+        <div id="Wait"></div>
+        <br><br>
+        <div id="Data"></div>
+    </body>
+</html>
